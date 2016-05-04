@@ -1,0 +1,44 @@
+<div class="panel panel-default">
+  <!-- Default panel contents -->
+  <div class="panel-heading">
+  <caption class="pull-right">No. of Unpaid: {{requests.length}}</caption>
+
+  </div>
+
+  <!-- Table -->
+ <table class = "table table-hover">
+    
+   <thead>
+      <tr>
+         <th>#</th>
+         <th>Client id </th>
+         <th>Client Names</th>
+         <th>Client Contacts</th>
+         <th>product </th>
+          <th>Channel </th>
+          <th>Premium payable </th>
+          <th>Request Date </th>
+          <th>Status </th>
+      </tr>
+   </thead>
+   
+   <tbody>
+      
+        <tr dir-paginate="req in requests |   itemsPerPage:4 ">
+         <td>{{$index+1}}</td>
+         <td>{{req.docid}}</td>
+         <td>{{req.clientnames}}</td>
+         <td>{{req.contacts}}</td>
+         <td>{{req.productname}}</td>
+          <td>{{req.channelname}}</td>
+             <td>{{req.premiumpayable}}</td>
+          <td>{{req.registrationdate | date:'MM/dd/yyyy @ h:mma' }}</td>
+        
+         <td>{{req.paymentDescription}}</td>
+      </tr>
+       <dir-pagination-controls   max-size="4"  direction-links="true"  boundary-links="true" >  </dir-pagination-controls>
+     
+   </tbody>
+   
+</table>
+</div>

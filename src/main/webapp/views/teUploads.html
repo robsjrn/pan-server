@@ -1,0 +1,45 @@
+<div class="panel panel-default">
+  <!-- Default panel contents -->
+  <div class="panel-heading">
+  <caption class="pull-right">Total Request to Upload : {{requests.length}}</caption>
+  <button class="btn btn-warning pull-right" ng-click="generatefiles">Process All</button>
+
+  </div>
+
+  <!-- Table -->
+ <table class = "table table-hover">
+    
+   <thead>
+      <tr>
+         <th>Client id </th>
+         <th>Client Names</th>
+         <th>product </th>
+          <th>Channel </th>
+          <th>Premium payable </th>
+          <th>Policyid </th>
+          <th>Confirmed By </th>
+          <th>Action</th>
+      </tr>
+   </thead>
+   
+   <tbody>
+      
+        <tr dir-paginate="req in requests |   itemsPerPage:4 ">
+    
+         <td>{{req.docid}}</td>
+         <td>{{req.clientnames}}</td>
+         <td>{{req.productname}}</td>
+          <td>{{req.channelname}}</td>
+           <td>{{req.premiumpayable}}</td>
+         <td>{{req.policyid}}</td>
+         <td>{{req.policyConfirmedBy}}</td>
+         
+
+         <td><button class="btn btn-danger" ng-click="generatefile(req)">Download TE File</button></td>
+      </tr>
+       <dir-pagination-controls   max-size="4"  direction-links="true"  boundary-links="true" >  </dir-pagination-controls>
+     
+   </tbody>
+   
+</table>
+</div>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
+    <display-name>Umash</display-name>
+    <listener>
+        <description>loading configuration</description>
+        <listener-class>com.panafrica.umash.configuration.UmashConfig</listener-class>
+    </listener>
+   
+    <servlet>
+        <servlet-name>Umash Service</servlet-name>
+        <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
+        <init-param>
+            <param-name>jersey.config.server.provider.packages</param-name>
+            <param-value>com.panafrica.umash.endpoint;com.panafrica.umash.ExceptionHandling,com.fasterxml.jackson.jaxrs.json</param-value>
+        </init-param>
+        <init-param>
+              <param-name>jersey.config.server.provider.classnames</param-name>
+            <param-value>com.panafrica.umash.cors.CORSResponseFilter</param-value>
+        </init-param>
+        
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Umash Service</servlet-name>
+        <url-pattern>/rest/*</url-pattern>
+    </servlet-mapping>
+</web-app>
+

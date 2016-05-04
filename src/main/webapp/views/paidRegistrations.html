@@ -1,0 +1,46 @@
+<div class="panel panel-default">
+  <!-- Default panel contents -->
+  <div class="panel-heading">
+  <caption class="pull-right">No. of Paid Clients : {{requests.length}}</caption>
+
+  </div>
+
+  <!-- Table -->
+ <table class = "table table-hover">
+    
+   <thead>
+      <tr>
+         <th>#</th>
+         <th>Client id </th>
+         <th>Client Names</th>
+         <th>product </th>
+          <th>Payment Channel </th>
+          <th>Premium payable </th>
+           <th>Registration Date </th>
+          <th>Payment Date </th>
+          <th>Transaction Id </th>
+          <th>Action </th>
+      </tr>
+   </thead>
+   
+   <tbody>
+      
+        <tr dir-paginate="req in requests |   itemsPerPage:4 ">
+         <td>{{$index+1}}</td>
+         <td><a ng-click="viewclient(req.docid)">{{req.docid}}</a></td>
+         <td>{{req.clientnames}}</td>
+         <td>{{req.productname}}</td>
+          <td>{{req.paymentChannel}}</td>
+           <td>{{req.premiumpayable}}</td>
+         <td>{{req.registrationdate | date:'MM/dd/yyyy @ h:mma'}}</td>
+           <td>{{req.paymentdate | date:'MM/dd/yyyy @ h:mma'}}</td>
+         <td><a ng-click="viewpayment(req.paymentid)">{{req.paymentid}}</a></td>
+      
+          <td><button class="button btn-danger" ng-click="process(req)">Process</button></td>
+      </tr>
+       <dir-pagination-controls   max-size="4"  direction-links="true"  boundary-links="true" >  </dir-pagination-controls>
+     
+   </tbody>
+   
+</table>
+</div>
