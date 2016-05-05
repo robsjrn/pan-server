@@ -505,6 +505,27 @@ public class ClientsJpaController implements Serializable {
          return cli;
     }
     
+    public List<Clients> getregisteredclients(){
+            List<Clients> cli=null;    
+            EntityManager em = getEntityManager();
+         try {
+            
+            cli= em.createNamedQuery("Clients.findByStatusid", Clients.class)
+                    .setParameter("statusid", 4)
+                    .getResultList();
+        } 
+         catch(Exception ex){
+            ex.printStackTrace();
+          
+                 }
+         finally {
+          
+            em.close();
+             
+         }
+         return cli;
+    }
+    
     public List<Clients> getUnpaidRequests(){
             List<Clients> cli=null;    
             EntityManager em = getEntityManager();

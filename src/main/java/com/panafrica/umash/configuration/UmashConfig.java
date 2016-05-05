@@ -88,6 +88,9 @@ public class UmashConfig implements ServletContextListener {
                                  conf.setAppEmailaddress(config.getString("portal.AppEmailaddress"));
                                  conf.setAppEmailhost(config.getString("portal.AppEmailhost"));
                                  conf.setAppEmailport(config.getString("portal.AppEmailport"));
+                                 conf.setTtlMillis(config.getString("portal.TtlMillis"));
+                                 
+                                 
               
                } catch(Exception ex){
                    

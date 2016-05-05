@@ -6,6 +6,7 @@
 package com.panafrica.umash.services;
 
 import com.panafrica.umash.controllers.AppusersJpaController;
+import com.panafrica.umash.controllers.AuditJpaController;
 import com.panafrica.umash.controllers.BeneficiariesJpaController;
 import com.panafrica.umash.controllers.BeneficiarychangerequestJpaController;
 import com.panafrica.umash.controllers.ChildrensJpaController;
@@ -23,6 +24,7 @@ import com.panafrica.umash.controllers.UsersJpaController;
 import com.panafrica.umash.controllers.exceptions.RollbackFailureException;
 import com.panafrica.umash.helpers.Policynumber;
 import com.panafrica.umash.model.Appusers;
+import com.panafrica.umash.model.Audit;
 import com.panafrica.umash.model.Beneficiaries;
 import com.panafrica.umash.model.Beneficiarychangerequest;
 import com.panafrica.umash.model.Childrens;
@@ -37,7 +39,9 @@ import com.panafrica.umash.model.Sms;
 import com.panafrica.umash.model.Spouse;
 import com.panafrica.umash.model.Teuploads;
 import com.panafrica.umash.model.Users;
+import com.panafrica.umash.security.LoginToken;
 import com.panafrica.umash.security.MD5Checksum;
+import com.panafrica.umash.security.tokendetails;
 import com.panafrica.umash.sms.SmsService;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -83,19 +87,34 @@ public class PortalService {
        
        return iprserrorsJpaController.findIprserrorsEntities();
    }
+   
+     public List<Audit>  getaudits(){
+       AuditJpaController ajc  = new AuditJpaController();
+       
+       return ajc.findAuditEntities();
+   }
+     
    public List<Feedback>  Feedback(){
        FeedbackJpaController fjc = new FeedbackJpaController();
        
        return fjc.findFeedbackEntities();
    }
    
-       public String createuser(String user){
+       public String createuser(String user,String token){
+           
+              LoginToken  loginToken= new LoginToken();     
+               tokendetails tkn=loginToken.parseJWT(token); 
+               JSONObject resObj= new JSONObject() ;
+               if (tkn !=null){
+           
          UsersJpaController  ujc= new UsersJpaController ();
          JSONObject reqObj= new JSONObject() ;
-            JSONObject resObj= new JSONObject() ;
+            
             JSONParser parser = new JSONParser();
         try {
             reqObj= (JSONObject) parser.parse(user);
+            
+       
             
             MD5Checksum md5 = new MD5Checksum();
             
@@ -103,7 +122,7 @@ public class PortalService {
                    ipu.setDepartment(reqObj.get("department").toString());
                    ipu.setEmail(reqObj.get("email").toString());
                    ipu.setStatusdescription("User Enabled");
-                   ipu.setCreatedby("system");
+                   ipu.setCreatedby(tkn.getUsername());
                    ipu.setCreateddate(new Date());
                    ipu.setStatusid(1);
                    ipu.setUsername(reqObj.get("username").toString());
@@ -113,7 +132,7 @@ public class PortalService {
                    resObj.put("status", 1);
                    resObj.put("Message", "User Created");
                   
-                  
+           audit(tkn.getUsername(),"Created User : "+reqObj.get("username").toString());       
             
        }catch(Exception ex){
            resObj.put("status", 2);
@@ -121,6 +140,7 @@ public class PortalService {
            resObj.put("DeveloperMessage", ex);
            ex.printStackTrace();
        }
+               }
    return resObj.toJSONString();
    }
     public List<Clients> getNewRequests(){
@@ -129,6 +149,11 @@ public class PortalService {
         return clientsJpaController.getnewRequests();
     }
     
+    public List<Clients> getregisteredclients(){
+        clientsJpaController = new ClientsJpaController();
+        
+        return clientsJpaController.getregisteredclients();
+    }
     
      public List<Clients> Overpayments(){
         clientsJpaController = new ClientsJpaController();
@@ -207,14 +232,18 @@ public class PortalService {
            
             return smsJpaController.findSmsEntities();
      }
-     public String ProcessClient(JSONObject Obj){
+     public String ProcessClient(JSONObject Obj,String token){
+           
+         LoginToken  loginToken= new LoginToken();     
+               tokendetails tkn=loginToken.parseJWT(token); 
+         
           clientsJpaController = new ClientsJpaController();
             JSONObject resObj= new JSONObject() ;
             Policynumber policynumber = new Policynumber();
               
               Clients cl = new Clients();
               
-                   cl.setPolicyConfirmedBy("test");
+                   cl.setPolicyConfirmedBy(tkn.getUsername());
                    cl.setPolicycomment(Obj.get("comments").toString());
                    cl.setPolicyconfirmedDate(new Date());
                    cl.setPolicystatus(1);
@@ -244,6 +273,8 @@ public class PortalService {
                     
                   
               }
+                
+            audit(tkn.getUsername(),"Approved Client :"+client2.getClientnames());
              resObj.put("status", 1);
              resObj.put("statusMessage", "Client Successfuly Processed");
                 
@@ -645,6 +676,7 @@ public class PortalService {
             appu.setStatusname("Enabled");
             appu.setUserrole("client");
             appusersJpaController.create(appu);
+          
          }
          else {
              System.out.println("User Already Exists");
@@ -667,9 +699,28 @@ public class PortalService {
             te.setUploaddate(new Date());
             
             tec.create(te);
+            
+            audit(uploadedby,"Uploaded TE File "+ filename);
         } catch (Exception ex) {
             Logger.getLogger(PortalService.class.getName()).log(Level.SEVERE, null, ex);
         }
    }   
+   
+   
+   private void audit(String username,String action){
+        try {
+            AuditJpaController ajc = new AuditJpaController();
+            Audit audit = new Audit ();
+            audit.setActiondate(new Date());
+            audit.setActiondone(action);
+            audit.setUsername(username);
+            
+            ajc.create(audit);
+        } catch (Exception ex) {
+           log.error(ex);
+        }
+       
+      
+   }
      
 }

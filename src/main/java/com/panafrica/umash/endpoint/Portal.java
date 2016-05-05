@@ -7,6 +7,7 @@ package com.panafrica.umash.endpoint;
 
 import com.panafrica.umash.controllers.IprserrorsJpaController;
 import com.panafrica.umash.jms.Producer;
+import com.panafrica.umash.model.Audit;
 import com.panafrica.umash.model.Beneficiarychangerequest;
 import com.panafrica.umash.model.Claims;
 import com.panafrica.umash.model.Clients;
@@ -60,9 +61,10 @@ public class Portal {
     @POST
      @Path("createuser")
      @Consumes(MediaType.APPLICATION_JSON)
-     public String createuser(String userdetails){
+     public String createuser(@Context HttpHeaders headers,String userdetails){
         PortalService login = new PortalService(); 
-        return login.createuser(userdetails);
+        String token =headers.getRequestHeader("token").get(0);  
+        return login.createuser(userdetails,token);
      }
     
     
@@ -74,6 +76,25 @@ public class Portal {
         
         return portalService.getNewRequests();
       }
+    
+     @GET
+    @Path("registeredclients")
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+    public List<Clients> getregisteredclients(@Context HttpHeaders headers) {
+      portalService = new PortalService();
+        
+        return portalService.getregisteredclients();
+      }
+    
+    @GET
+    @Path("audittrail")
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+    public List<Audit> getaudittrail(@Context HttpHeaders headers) {
+      portalService = new PortalService();
+        
+        return portalService.getaudits();
+      }
+    
     
      @GET
     @Path("unpaid")
@@ -163,7 +184,8 @@ public class Portal {
        @POST
        @Path("process")
        @Consumes(MediaType.APPLICATION_JSON)
-     public String process(String details){
+     public String process(@Context HttpHeaders headers,String details){
+         String token =headers.getRequestHeader("token").get(0); 
          JSONObject reqObj= new JSONObject() ;
           JSONObject resObj= new JSONObject() ;
         String response;
@@ -174,7 +196,7 @@ public class Portal {
             
             //System.out.println(reqObj);
             
-           response= portalService.ProcessClient(reqObj);
+           response= portalService.ProcessClient(reqObj,token);
         }catch(Exception ex){
                 resObj.put("status", 0);
                 resObj.put("statusMessage", "Error Processing Your Request");

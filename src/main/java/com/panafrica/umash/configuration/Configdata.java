@@ -28,6 +28,7 @@ public class Configdata {
     private String AppEmailaddress;
     private String AppEmailhost;
     private String AppEmailport;
+    private String TtlMillis;
 
     /**
      * @return the uploaddir
@@ -265,6 +266,20 @@ public class Configdata {
      */
     public void setAppEmailport(String AppEmailport) {
         this.AppEmailport = AppEmailport;
+    }
+
+    /**
+     * @return the TtlMillis
+     */
+    public String getTtlMillis() {
+        return TtlMillis;
+    }
+
+    /**
+     * @param TtlMillis the TtlMillis to set
+     */
+    public void setTtlMillis(String TtlMillis) {
+        this.TtlMillis = TtlMillis;
     }
     
     

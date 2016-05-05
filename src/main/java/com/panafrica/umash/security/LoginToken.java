@@ -17,7 +17,7 @@ public class LoginToken {
     private Appconstants  appconst;
     tokendetails tkn;
     public String createJWT(String id, String subject ) {
-       long ttlMillis= Long.valueOf(appconst.getConfigdata().getTokenTtl());
+       long ttlMillis= Long.valueOf(appconst.getConfigdata().getTtlMillis());
        String issuer =appconst.getConfigdata().getTokenIssuer();
 //The JWT signature algorithm we will be using to sign the token
 SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
@@ -60,12 +60,10 @@ Claims claims = Jwts.parser()
   
 JSONObject jsonObject = new JSONObject(claims.getSubject());
             tkn.setUsername((String) jsonObject.get("username"));
-            
-//System.out.println("Expiration: " + claims.getExpiration());
 
-//util.info("Expiration: " + claims.getExpiration());
 
 }catch(Exception ex){
+    ex.printStackTrace();
     tkn=null;
 }
 return tkn;
