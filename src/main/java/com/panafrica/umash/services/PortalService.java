@@ -11,6 +11,7 @@ import com.panafrica.umash.controllers.BeneficiarychangerequestJpaController;
 import com.panafrica.umash.controllers.ChildrensJpaController;
 import com.panafrica.umash.controllers.ClaimsJpaController;
 import com.panafrica.umash.controllers.ClientsJpaController;
+import com.panafrica.umash.controllers.FeedbackJpaController;
 import com.panafrica.umash.controllers.IprserrorsJpaController;
 import com.panafrica.umash.controllers.MpesatransactionsJpaController;
 import com.panafrica.umash.controllers.ParentsJpaController;
@@ -18,6 +19,7 @@ import com.panafrica.umash.controllers.PaymentsJpaController;
 import com.panafrica.umash.controllers.SmsJpaController;
 import com.panafrica.umash.controllers.SpouseJpaController;
 import com.panafrica.umash.controllers.TeuploadsJpaController;
+import com.panafrica.umash.controllers.UsersJpaController;
 import com.panafrica.umash.controllers.exceptions.RollbackFailureException;
 import com.panafrica.umash.helpers.Policynumber;
 import com.panafrica.umash.model.Appusers;
@@ -26,6 +28,7 @@ import com.panafrica.umash.model.Beneficiarychangerequest;
 import com.panafrica.umash.model.Childrens;
 import com.panafrica.umash.model.Claims;
 import com.panafrica.umash.model.Clients;
+import com.panafrica.umash.model.Feedback;
 import com.panafrica.umash.model.Iprserrors;
 import com.panafrica.umash.model.Mpesatransactions;
 import com.panafrica.umash.model.Parents;
@@ -33,6 +36,8 @@ import com.panafrica.umash.model.Payments;
 import com.panafrica.umash.model.Sms;
 import com.panafrica.umash.model.Spouse;
 import com.panafrica.umash.model.Teuploads;
+import com.panafrica.umash.model.Users;
+import com.panafrica.umash.security.MD5Checksum;
 import com.panafrica.umash.sms.SmsService;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -53,6 +58,7 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 
 /**
  *
@@ -76,6 +82,46 @@ public class PortalService {
        iprserrorsJpaController = new IprserrorsJpaController();
        
        return iprserrorsJpaController.findIprserrorsEntities();
+   }
+   public List<Feedback>  Feedback(){
+       FeedbackJpaController fjc = new FeedbackJpaController();
+       
+       return fjc.findFeedbackEntities();
+   }
+   
+       public String createuser(String user){
+         UsersJpaController  ujc= new UsersJpaController ();
+         JSONObject reqObj= new JSONObject() ;
+            JSONObject resObj= new JSONObject() ;
+            JSONParser parser = new JSONParser();
+        try {
+            reqObj= (JSONObject) parser.parse(user);
+            
+            MD5Checksum md5 = new MD5Checksum();
+            
+            Users ipu = new Users();
+                   ipu.setDepartment(reqObj.get("department").toString());
+                   ipu.setEmail(reqObj.get("email").toString());
+                   ipu.setStatusdescription("User Enabled");
+                   ipu.setCreatedby("system");
+                   ipu.setCreateddate(new Date());
+                   ipu.setStatusid(1);
+                   ipu.setUsername(reqObj.get("username").toString());
+                   ipu.setPasssword(md5.hashPassword(reqObj.get("password").toString()));
+              
+                   ujc.create(ipu);                  
+                   resObj.put("status", 1);
+                   resObj.put("Message", "User Created");
+                  
+                  
+            
+       }catch(Exception ex){
+           resObj.put("status", 2);
+           resObj.put("Message", "Error Creaing User");
+           resObj.put("DeveloperMessage", ex);
+           ex.printStackTrace();
+       }
+   return resObj.toJSONString();
    }
     public List<Clients> getNewRequests(){
         clientsJpaController = new ClientsJpaController();

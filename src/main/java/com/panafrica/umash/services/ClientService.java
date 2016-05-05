@@ -12,6 +12,7 @@ import com.panafrica.umash.controllers.BeneficiariesJpaController;
 import com.panafrica.umash.controllers.ChildrensJpaController;
 import com.panafrica.umash.controllers.ClaimsJpaController;
 import com.panafrica.umash.controllers.ClientsJpaController;
+import com.panafrica.umash.controllers.FeedbackJpaController;
 import com.panafrica.umash.controllers.OfficelocationJpaController;
 import com.panafrica.umash.controllers.ParentsJpaController;
 import com.panafrica.umash.controllers.SpouseJpaController;
@@ -20,6 +21,7 @@ import com.panafrica.umash.model.Beneficiaries;
 import com.panafrica.umash.model.Childrens;
 import com.panafrica.umash.model.Claims;
 import com.panafrica.umash.model.Clients;
+import com.panafrica.umash.model.Feedback;
 import com.panafrica.umash.model.Officelocation;
 import com.panafrica.umash.model.Parents;
 import com.panafrica.umash.model.Spouse;
@@ -89,6 +91,32 @@ public class ClientService {
         }
           return resObj.toString();
     }
+    public String savefeedback(String details){
+          JSONObject reqObj= new JSONObject() ;
+            JSONObject resObj= new JSONObject() ;
+            JSONParser parser = new JSONParser();
+        FeedbackJpaController fjc = new FeedbackJpaController();
+        
+            try {
+            reqObj= (JSONObject) parser.parse(details);
+               Feedback fb = new Feedback();
+                            fb.setComments(reqObj.get("comments").toString()); 
+                            fb.setContacts(reqObj.get("contact").toString());
+                            fb.setFeedbackdate(new Date());
+                            fb.setReplied(Boolean.FALSE);
+                             fjc.create(fb);
+            
+            resObj.put("status", 1);
+            resObj.put("Message", "Record Saved");
+
+        } catch (Exception ex) {
+               resObj.put("status", 2);
+               resObj.put("Mesage", "Error Occured");
+               resObj.put("DeveloperMesage", ex.toString());
+            log.error(ex);
+        }
+        return resObj.toJSONString();
+                }
     
     public String saveClaim(String details){
         
@@ -105,6 +133,7 @@ public class ClientService {
                   clms.setClaimdate(new Date());
                   clms.setClaimid(reqObj.get("doc").toString());
                   clms.setStatus(1);
+                  clms.setPhotoavailable(Boolean.FALSE);
                   clms.setStatusname("New Claim Request");
            
             claimsJpaController.create(clms);

@@ -546,6 +546,7 @@ public class Ussd {
             clms.setClaimdate(new Date());
             clms.setClaimid(result[1]);
             clms.setStatus(1);
+            clms.setPhotoavailable(Boolean.FALSE);
             clms.setStatusname("New Claim Request");
             
             claimsJpaController.create(clms);

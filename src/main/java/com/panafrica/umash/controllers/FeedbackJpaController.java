@@ -8,32 +8,34 @@ package com.panafrica.umash.controllers;
 import com.panafrica.umash.configuration.UmashConfig;
 import com.panafrica.umash.controllers.exceptions.NonexistentEntityException;
 import com.panafrica.umash.controllers.exceptions.RollbackFailureException;
-import com.panafrica.umash.model.Iprserrors;
+import com.panafrica.umash.model.Feedback;
 import java.io.Serializable;
 import java.util.List;
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
 import javax.persistence.EntityNotFoundException;
 import javax.persistence.EntityTransaction;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
+import javax.transaction.UserTransaction;
 
 /**
  *
  * @author User
  */
-public class IprserrorsJpaController implements Serializable {
+public class FeedbackJpaController implements Serializable {
 
    public EntityManager getEntityManager() {
         return UmashConfig.createEntityManager();
     }
-    public void create(Iprserrors iprserrors) throws RollbackFailureException, Exception {
-        EntityManager em = getEntityManager();
+
+    public void create(Feedback feedback) throws RollbackFailureException, Exception {
+           EntityManager em = getEntityManager();
         EntityTransaction utx = em.getTransaction();
         try {
             utx.begin();
-   
-            em.persist(iprserrors);
+            em.persist(feedback);
             utx.commit();
         } catch (Exception ex) {
             try {
@@ -49,12 +51,12 @@ public class IprserrorsJpaController implements Serializable {
         }
     }
 
-    public void edit(Iprserrors iprserrors) throws NonexistentEntityException, RollbackFailureException, Exception {
-          EntityManager em = getEntityManager();
+    public void edit(Feedback feedback) throws NonexistentEntityException, RollbackFailureException, Exception {
+           EntityManager em = getEntityManager();
         EntityTransaction utx = em.getTransaction();
         try {
             utx.begin();
-            iprserrors = em.merge(iprserrors);
+            feedback = em.merge(feedback);
             utx.commit();
         } catch (Exception ex) {
             try {
@@ -64,9 +66,9 @@ public class IprserrorsJpaController implements Serializable {
             }
             String msg = ex.getLocalizedMessage();
             if (msg == null || msg.length() == 0) {
-                Integer id = iprserrors.getTid();
-                if (findIprserrors(id) == null) {
-                    throw new NonexistentEntityException("The iprserrors with id " + id + " no longer exists.");
+                Integer id = feedback.getTid();
+                if (findFeedback(id) == null) {
+                    throw new NonexistentEntityException("The feedback with id " + id + " no longer exists.");
                 }
             }
             throw ex;
@@ -78,18 +80,18 @@ public class IprserrorsJpaController implements Serializable {
     }
 
     public void destroy(Integer id) throws NonexistentEntityException, RollbackFailureException, Exception {
-          EntityManager em = getEntityManager();
+           EntityManager em = getEntityManager();
         EntityTransaction utx = em.getTransaction();
         try {
             utx.begin();
-            Iprserrors iprserrors;
+            Feedback feedback;
             try {
-                iprserrors = em.getReference(Iprserrors.class, id);
-                iprserrors.getTid();
+                feedback = em.getReference(Feedback.class, id);
+                feedback.getTid();
             } catch (EntityNotFoundException enfe) {
-                throw new NonexistentEntityException("The iprserrors with id " + id + " no longer exists.", enfe);
+                throw new NonexistentEntityException("The feedback with id " + id + " no longer exists.", enfe);
             }
-            em.remove(iprserrors);
+            em.remove(feedback);
             utx.commit();
         } catch (Exception ex) {
             try {
@@ -105,19 +107,19 @@ public class IprserrorsJpaController implements Serializable {
         }
     }
 
-    public List<Iprserrors> findIprserrorsEntities() {
-        return findIprserrorsEntities(true, -1, -1);
+    public List<Feedback> findFeedbackEntities() {
+        return findFeedbackEntities(true, -1, -1);
     }
 
-    public List<Iprserrors> findIprserrorsEntities(int maxResults, int firstResult) {
-        return findIprserrorsEntities(false, maxResults, firstResult);
+    public List<Feedback> findFeedbackEntities(int maxResults, int firstResult) {
+        return findFeedbackEntities(false, maxResults, firstResult);
     }
 
-    private List<Iprserrors> findIprserrorsEntities(boolean all, int maxResults, int firstResult) {
+    private List<Feedback> findFeedbackEntities(boolean all, int maxResults, int firstResult) {
         EntityManager em = getEntityManager();
         try {
             CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
-            cq.select(cq.from(Iprserrors.class));
+            cq.select(cq.from(Feedback.class));
             Query q = em.createQuery(cq);
             if (!all) {
                 q.setMaxResults(maxResults);
@@ -129,20 +131,20 @@ public class IprserrorsJpaController implements Serializable {
         }
     }
 
-    public Iprserrors findIprserrors(Integer id) {
+    public Feedback findFeedback(Integer id) {
         EntityManager em = getEntityManager();
         try {
-            return em.find(Iprserrors.class, id);
+            return em.find(Feedback.class, id);
         } finally {
             em.close();
         }
     }
 
-    public int getIprserrorsCount() {
+    public int getFeedbackCount() {
         EntityManager em = getEntityManager();
         try {
             CriteriaQuery cq = em.getCriteriaBuilder().createQuery();
-            Root<Iprserrors> rt = cq.from(Iprserrors.class);
+            Root<Feedback> rt = cq.from(Feedback.class);
             cq.select(em.getCriteriaBuilder().count(rt));
             Query q = em.createQuery(cq);
             return ((Long) q.getSingleResult()).intValue();

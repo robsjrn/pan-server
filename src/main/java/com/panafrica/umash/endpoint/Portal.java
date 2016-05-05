@@ -10,6 +10,7 @@ import com.panafrica.umash.jms.Producer;
 import com.panafrica.umash.model.Beneficiarychangerequest;
 import com.panafrica.umash.model.Claims;
 import com.panafrica.umash.model.Clients;
+import com.panafrica.umash.model.Feedback;
 import com.panafrica.umash.model.Iprserrors;
 import com.panafrica.umash.model.Mpesatransactions;
 import com.panafrica.umash.model.Payments;
@@ -54,6 +55,15 @@ public class Portal {
         
         return portalService.getSummary();
       }
+    
+    
+    @POST
+     @Path("createuser")
+     @Consumes(MediaType.APPLICATION_JSON)
+     public String createuser(String userdetails){
+        PortalService login = new PortalService(); 
+        return login.createuser(userdetails);
+     }
     
     
      @GET
@@ -199,6 +209,27 @@ public class Portal {
      }
      
      
+        @POST
+       @Path("iprsprocessdelete")
+       @Consumes(MediaType.APPLICATION_JSON)
+     public String iprsprocessdelete(String details){
+         
+          JSONObject resObj= new JSONObject() ;
+          JSONParser parser = new JSONParser();
+        try {
+           JSONObject  reqObj= (JSONObject) parser.parse(details);      
+           IprserrorsJpaController ipjc = new IprserrorsJpaController();
+           ipjc.destroy(((Long)reqObj.get("tid")).intValue());
+           
+            resObj.put("status", 1);
+            resObj.put("message", "Request Deleted");
+        }catch(Exception ex){
+             resObj.put("status", 2);
+             resObj.put("message", "Error");
+             resObj.put("Developermessage", ex.getMessage());
+        }
+       return resObj.toString();
+     }
      
      @GET
     @Path("/getfile")
@@ -285,7 +316,7 @@ public class Portal {
         return portalService.Overpayments();
       }
     
-      @GET
+    @GET
     @Path("Underpayments")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
     public List<Clients> getUnderPayments(@Context HttpHeaders headers) {
@@ -294,5 +325,12 @@ public class Portal {
         return portalService.getUnderpayments();
       }
     
-    
+    @GET
+    @Path("feedbacks")
+    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+    public List<Feedback> feedbacks(@Context HttpHeaders headers) {
+      portalService = new PortalService();
+        
+        return portalService.Feedback();
+      }
 }

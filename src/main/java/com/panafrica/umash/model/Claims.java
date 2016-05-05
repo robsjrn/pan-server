@@ -13,6 +13,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
@@ -37,7 +38,9 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "Claims.findByStatus", query = "SELECT c FROM Claims c WHERE c.status = :status"),
     @NamedQuery(name = "Claims.findByStatusname", query = "SELECT c FROM Claims c WHERE c.statusname = :statusname"),
     @NamedQuery(name = "Claims.findByProcessedby", query = "SELECT c FROM Claims c WHERE c.processedby = :processedby"),
-    @NamedQuery(name = "Claims.findByProcesseddate", query = "SELECT c FROM Claims c WHERE c.processeddate = :processeddate")})
+    @NamedQuery(name = "Claims.findByProcesseddate", query = "SELECT c FROM Claims c WHERE c.processeddate = :processeddate"),
+    @NamedQuery(name = "Claims.findByPhotoavailable", query = "SELECT c FROM Claims c WHERE c.photoavailable = :photoavailable"),
+    @NamedQuery(name = "Claims.findByPhotoname", query = "SELECT c FROM Claims c WHERE c.photoname = :photoname")})
 public class Claims implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -66,6 +69,14 @@ public class Claims implements Serializable {
     @Column(name = "processeddate")
     @Temporal(TemporalType.TIMESTAMP)
     private Date processeddate;
+    @Column(name = "photoavailable")
+    private Boolean photoavailable;
+    @Lob
+    @Column(name = "photo")
+    private byte[] photo;
+    @Size(max = 30)
+    @Column(name = "photoname")
+    private String photoname;
 
     public Claims() {
     }
@@ -136,6 +147,30 @@ public class Claims implements Serializable {
 
     public void setProcesseddate(Date processeddate) {
         this.processeddate = processeddate;
+    }
+
+    public Boolean getPhotoavailable() {
+        return photoavailable;
+    }
+
+    public void setPhotoavailable(Boolean photoavailable) {
+        this.photoavailable = photoavailable;
+    }
+
+    public byte[] getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(byte[] photo) {
+        this.photo = photo;
+    }
+
+    public String getPhotoname() {
+        return photoname;
+    }
+
+    public void setPhotoname(String photoname) {
+        this.photoname = photoname;
     }
 
     @Override

@@ -6,14 +6,26 @@
 package com.panafrica.umash.endpoint;
 
 import com.panafrica.umash.Appnotification.gcm.SendAppNotification;
+import com.panafrica.umash.controllers.ClaimsJpaController;
 import com.panafrica.umash.model.Beneficiaries;
 import com.panafrica.umash.model.Childrens;
+import com.panafrica.umash.model.Claims;
 import com.panafrica.umash.model.Clients;
 import com.panafrica.umash.model.Officelocation;
 import com.panafrica.umash.model.Parents;
 import com.panafrica.umash.model.Spouse;
 import com.panafrica.umash.services.ClientService;
+import com.panafrica.umash.services.SendMail;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -23,8 +35,14 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import org.apache.commons.io.IOUtils;
+import org.glassfish.jersey.media.multipart.FormDataBodyPart;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.glassfish.jersey.media.multipart.FormDataMultiPart;
+import org.glassfish.jersey.media.multipart.FormDataParam;
 
 /**
  *
@@ -48,11 +66,72 @@ public class client {
      @Consumes(MediaType.APPLICATION_JSON)
      public String claim(String details){
          clientService = new ClientService();
-         System.out.println("***** Claim *****");
-         System.out.println(details);
-         System.out.println("***** Claim *****");
         return clientService.saveClaim(details); 
      }
+     
+
+     
+      @POST
+      @Path("uploadclaimdoc")
+        @Consumes(MediaType.MULTIPART_FORM_DATA)
+        public Response uploadAsset(FormDataMultiPart multipart) {
+
+            Map<String, List<FormDataBodyPart>> map = multipart.getFields();
+
+            for (Map.Entry<String, List<FormDataBodyPart>> entry : map.entrySet()) {
+
+                for (FormDataBodyPart part : entry.getValue()) {
+                    InputStream in = part.getEntityAs(InputStream.class);
+                    String name = part.getName();
+                 
+                    saveimages(name,name,filetobase64Array(in));
+                }
+            }
+            return Response.ok("files Received").build();
+        }
+        
+        private byte[] filetobase64Array(InputStream is){
+           byte[] bytes=null;
+            try {
+            bytes = IOUtils.toByteArray(is);
+            
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        return bytes;
+         }
+        
+        private void saveimages(String contact,String docid,byte[] photoimage){
+            
+        try {
+            ClaimsJpaController  claimsJpaController = new ClaimsJpaController();
+            Claims clms = new Claims();
+            clms.setClaimcontact(contact);
+            clms.setClaimdate(new Date());
+            clms.setClaimid(docid);
+            clms.setStatus(1);
+            clms.setStatusname("New Claim Request");
+            clms.setPhotoavailable(Boolean.TRUE);
+            clms.setPhoto(photoimage);
+            
+            claimsJpaController.create(clms);
+            SendMail sendMail = new SendMail();
+            sendMail.SendClaimMail(clms);
+        } catch (Exception ex) {
+            Logger.getLogger(client.class.getName()).log(Level.SEVERE, null, ex);
+        }
+            
+        }
+     
+     @POST
+     @Path("comments")
+     @Consumes(MediaType.APPLICATION_JSON)
+     public String comments(String details){
+         clientService = new ClientService();
+        return clientService.savefeedback(details); 
+     }
+     
+     
      
      @POST
      @Path("editbeneficiary")

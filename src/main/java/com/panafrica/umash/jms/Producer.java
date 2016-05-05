@@ -115,7 +115,7 @@ public class Producer {
                         iprserrors.setStatusname("Iprs Connection Error");
                         
                          sendMail = new SendMail();
-                         sendMail.SendSystemStatus(" Iprs Unreachable ", ex);   
+                         sendMail.SendSystemStatus(" Iprs Message Queue Unreachable ", ex);   
                         
                          try {
                 ip.create(iprserrors);

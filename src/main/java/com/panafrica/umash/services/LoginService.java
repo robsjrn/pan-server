@@ -9,7 +9,9 @@ import com.panafrica.umash.controllers.AppusersJpaController;
 import com.panafrica.umash.controllers.UsersJpaController;
 import com.panafrica.umash.model.Appusers;
 import com.panafrica.umash.model.Users;
+import com.panafrica.umash.security.MD5Checksum;
 import org.apache.logging.log4j.LogManager;
+import org.json.JSONObject;
 
 /**
  *
@@ -54,8 +56,10 @@ public class LoginService {
           Users appusers  =  appu.findUserByusername(username);
           
           if (appusers != null){
-              if ( appusers.getPasssword().equalsIgnoreCase(password)){
-                 status=true; 
+               MD5Checksum md5 = new MD5Checksum();
+             
+              if (md5.Checkhash(appusers.getPasssword(), password)){
+                       status=true; 
               }
              
          }
